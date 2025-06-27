@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  mysql_db:
+    image: mysql:8.0
+    container_name: my_mysql_container
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: zona_fit_db
+      MYSQL_USER: lumusitech
+      MYSQL_PASSWORD: admin
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Opcional: Descomentar para ejecutar un script SQL inicial
+      # Coloca tu archivo init.sql en la misma carpeta que docker-compose.yml
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "lumusitech", "-padmin" ]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+
+volumes:
+  mysql_data:
