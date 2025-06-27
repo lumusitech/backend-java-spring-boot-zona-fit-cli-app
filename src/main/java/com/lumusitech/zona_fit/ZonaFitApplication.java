@@ -25,7 +25,7 @@ public class ZonaFitApplication implements CommandLineRunner {
         logger.info("Aplicación finalizada");
     }
 
-    private static int showMenu(Scanner scanner) {
+    private int showMenu(Scanner scanner) {
         logger.info("");
         logger.info("*** Aplicación Zona Fit (GYM) ***");
         logger.info("""                         
@@ -45,16 +45,12 @@ public class ZonaFitApplication implements CommandLineRunner {
         switch (option) {
             case 1 -> {
                 logger.info("--- Lista de Clientes ---");
-                List<Customer> customers = this.customerService.findAll();
-                customers.forEach(customer -> logger.info(customer.toString()));
+                listCustomers();
                 break;
             }
             case 2 -> {
                 logger.info("--- Buscar Cliente ---");
-                Integer id = getId(scanner);
-                var customer = this.customerService.findById(id);
-                if (customer != null) logger.info("Cliente encontrado: {}", customer);
-                else logger.info("Cliente con id {} NO encontrado!", id);
+                findCustomer(scanner);
                 break;
             }
             case 3 -> {
@@ -69,10 +65,7 @@ public class ZonaFitApplication implements CommandLineRunner {
             }
             case 5 -> {
                 logger.info("--- Borrar Cliente ---");
-                Integer id = getId(scanner);
-                Customer customer = new Customer();
-                customer.setId(id);
-                this.customerService.delete(customer);
+                deleteCustomer(scanner);
                 break;
             }
             case 6 -> {
@@ -105,6 +98,18 @@ public class ZonaFitApplication implements CommandLineRunner {
         }
     }
 
+    private void findCustomer(Scanner scanner) {
+        Integer id = getId(scanner);
+        var customer = this.customerService.findById(id);
+        if (customer != null) logger.info("Cliente encontrado: {}", customer);
+        else logger.info("Cliente con id {} NO encontrado!", id);
+    }
+
+    private void listCustomers() {
+        List<Customer> customers = this.customerService.findAll();
+        customers.forEach(customer -> logger.info(customer.toString()));
+    }
+
     private void saveCustomer(Scanner scanner) {
         String name = getData("Nombre: ", scanner);
         String lastname = getData("Apellido: ", scanner);
@@ -116,12 +121,26 @@ public class ZonaFitApplication implements CommandLineRunner {
 
     private void updateCustomer(Scanner scanner) {
         Integer id = getId(scanner);
-        String name = getData("Nombre: ", scanner);
-        String lastname = getData("Apellido: ", scanner);
-        Integer membership = getMembership(scanner);
-        Customer customer = new Customer(id, name, lastname, membership);
-        this.customerService.save(customer);
-        logger.info("Cliente actualizado: {}", customer);
+        Customer customer = this.customerService.findById(id);
+        if (customer != null) {
+            String name = getData("Nombre: ", scanner);
+            String lastname = getData("Apellido: ", scanner);
+            Integer membership = getMembership(scanner);
+            customer.setName(name);
+            customer.setLastname(lastname);
+            customer.setMembership(membership);
+            this.customerService.save(customer);
+            logger.info("Cliente actualizado: {}", customer);
+        } else {
+            logger.info("No existe un Cliente con el id {}", id);
+        }
+    }
+
+    private void deleteCustomer(Scanner scanner) {
+        Integer id = getId(scanner);
+        Customer customer = new Customer();
+        customer.setId(id);
+        this.customerService.delete(customer);
     }
 
     private Integer getId(Scanner scanner) {
