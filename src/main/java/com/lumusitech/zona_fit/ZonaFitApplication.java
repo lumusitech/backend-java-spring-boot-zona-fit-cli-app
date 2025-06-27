@@ -26,9 +26,9 @@ public class ZonaFitApplication implements CommandLineRunner {
     }
 
     private static int showMenu(Scanner scanner) {
+        logger.info("");
         logger.info("*** Aplicación Zona Fit (GYM) ***");
         logger.info("""                         
-                *** ZONA FIT GYM
                 1. Listar clientes
                 2. Buscar Cliente
                 3. Agregar cliente
